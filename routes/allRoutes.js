@@ -3,7 +3,9 @@ const { getTrainerProfile, getClient, getTrainer, getAllClasses, getOneClass, ge
 var router = express.Router();
 const { checkUser, requireAuth} = require('../middleware/authCheck');
 
-router.get('/', (req, res) => res.send('Hello World!'));
+router.get("/", (req, res) => {
+    res.send("Hello world this is the immediate fitness server");
+});
 router.get('/user', checkUser);
 router.get('/auth/dashboard/:id', requireAuth, dashboard);
 router.get('/auth/dashboard/trainer/classes', requireAuth, trainerClasses);

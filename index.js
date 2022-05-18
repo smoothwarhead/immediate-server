@@ -46,9 +46,6 @@ app.use( function(req, res, next) {
   
 });
 
-app.get("/", (req, res) => {
-    res.send("Hello world this is the immediate fitness server");
-});
 
 
 //404 handler and pass to error handler
