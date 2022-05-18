@@ -8,6 +8,9 @@ const cors = require('cors');
 const fileUpload = require('express-fileupload');
 let PORT = process.env.PORT || 5000;
 
+const allRoutes = require('./routes/allRoutes');
+const authRoutes = require('./routes/authRoutes');
+
 app.use(logger('dev'));
 
 app.use(cors());
@@ -18,7 +21,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(fileUpload());
 
 
-
+app.use(allRoutes);
+app.use(authRoutes);
 
 
 
