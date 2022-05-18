@@ -12,7 +12,8 @@ exports.getClientClass = (userId, res, next) => {
 
         db.query(getClientId, [userId], (err, result) => {
             if(err){
-                console.log(err)
+                next(createError("Internal server error"));
+                return;
             }
             if(result){
 
@@ -29,17 +30,16 @@ exports.getClientClass = (userId, res, next) => {
 
                 db.query(query2, [clientId], (err, result2) => {
                     if(err){
-                        res.status(401).json({
-                            classes: [],
-                            logIn: true,
-                            message: "No class to display at this time"
-                        });
+
+                        next(createError("Internal server error"));
+                        return;
+                       
                     }
                     if(result2.length === 0){
                         res.status(401).json({
                             classes: [],
                             logIn: true,
-                            message: "There is no class created yet"
+                            message: "No class to display at this time"
                         });
                     }
                     else{
@@ -60,6 +60,6 @@ exports.getClientClass = (userId, res, next) => {
         })
         
     } catch (error) {
-        console.log(error);
+        next(createError("Internal server error"));
     }
 }
