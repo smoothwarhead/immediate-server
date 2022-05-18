@@ -5,7 +5,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors');
 const fileUpload = require('express-fileupload');
-let PORT = process.env.PORT || 5000
+let PORT = process.env.PORT || 5000;
 
 app.use(logger('dev'));
 
@@ -34,7 +34,7 @@ app.use(fileUpload());
 app.use( function(req, res, next) {
 
     if (req.originalUrl && req.originalUrl.split("/").pop() === 'favicon.ico') {
-      return res.sendStatus(204);
+      return res.status(204);
     }
   
     return next();
@@ -42,7 +42,7 @@ app.use( function(req, res, next) {
 });
 
 app.get("/", (req, res) => {
-    res.send("Hello world");
+    res.send("Hello world this is the immediate fitness server");
 });
 
 
