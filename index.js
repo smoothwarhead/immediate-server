@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const createError = require("http-errors");
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
@@ -43,6 +44,24 @@ app.use( function(req, res, next) {
 
 app.get("/", (req, res) => {
     res.send("Hello world this is the immediate fitness server");
+});
+
+
+//404 handler and pass to error handler
+app.use((req, res, next) => {
+    next(createError(404, "Not found"));
+});
+
+
+//generic error handler
+app.use((error, req, res, next) => {
+    res.status(error.status || 500);
+    res.json({
+        error: {
+            status: error.status || 500,
+            message: error.message
+        }
+    })
 });
 
 
