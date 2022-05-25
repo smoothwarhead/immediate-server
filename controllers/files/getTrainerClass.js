@@ -1,4 +1,4 @@
-const db = require('../../database/dbConfig');
+const db = require('../../database/database');
 const fileUpload = require('express-fileupload');
 const { splitClass } = require('./splitClass');
 
@@ -29,22 +29,21 @@ exports.getTrainerClass = (userId, res, next) =>{
                         return;
                     }
                     if(result2.length === 0){
-                        res.status(401).json({
-                            classes: [],
-                            logIn: true,
-                            message: "There is no class created yet"
-                        });
+                        return res.status(204);
+                        
+                        
                     }
                     else{
                        
                         const classes = splitClass(result2);
                         
-                        res.status(200).json({
+                        return res.status(200).json({
                             classes: classes,
                             logIn: true
                         });
-    
-                        next();
+
+                         
+                        
                     }
                 })
     

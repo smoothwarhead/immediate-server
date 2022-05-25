@@ -1,4 +1,4 @@
-const db = require('../database/dbConfig');
+const db = require('../database/database');
 const fileUpload = require('express-fileupload');
 const jwt = require('jsonwebtoken');
 const { getClientClass } = require('./files/getClientClass');
@@ -15,9 +15,8 @@ exports.createTrainerProfile = (req, res, next) => {
         if(token){
             jwt.verify(token, 'fitness secret', (err, decodedToken) => {
                 if(err){
-                    res.status(401).json({
-                        user: [],
-                        logIn: false,
+                    return res.status(401).json({
+                        user: [],                    
                         message: "Please log in to your account"
                     });
                 }else{
@@ -79,15 +78,16 @@ exports.createTrainerProfile = (req, res, next) => {
                                     db.query(query2, [items.map(item => [item.item, trainerId, userId])], (err, result2) => {
                                         if(err){
                                             next(createError("Internal server error"));
+                                            return;
 
                                         }
                                                                                
     
-                                        res.status(201).json({
+                                        return res.status(201).json({
                                             logIn: true,
                                             message: "Profile successfully created"
                                         });
-                                        next();
+                                        
                                     }); 
                                     
     
@@ -96,8 +96,8 @@ exports.createTrainerProfile = (req, res, next) => {
                                     
                                 }
                                 else{
-                                    res.status(404).json({message: "No profile was created"});
-                                    next()
+                                    return res.status(204);
+                                    
                                 }
                         
                             
@@ -140,9 +140,8 @@ exports.createClientProfile = (req, res, next) => {
     if(token){
         jwt.verify(token, 'fitness secret', (err, decodedToken) => {
             if(err){
-                res.status(401).json({
-                    user: [],
-                    logIn: false,
+                return res.status(401).json({
+                    user: [],                    
                     message: "Please log in to your account"
                 });
             }else{
@@ -207,7 +206,7 @@ exports.createClientProfile = (req, res, next) => {
                                     }
                                                                         
 
-                                    res.status(201).json({
+                                    return res.status(201).json({
                                         logIn: true,
                                         message: "Profile successfully created"
                                     })
@@ -219,7 +218,7 @@ exports.createClientProfile = (req, res, next) => {
                                 
                             }
                             else{
-                                res.status(404).json({message: "No profile was created"})
+                                return res.status(404).json({message: "No profile was created"})
                             }
                     
                         
@@ -256,9 +255,8 @@ exports.createClass = (req, res, next) => {
     if(token){
         jwt.verify(token, 'fitness secret', (err, decodedToken) => {
             if(err){
-                res.status(401).json({
-                    user: [],
-                    logIn: false,
+                return res.status(401).json({
+                    user: [],                    
                     message: "Please log in to your account"
                 });
             }else{
@@ -316,7 +314,7 @@ exports.createClass = (req, res, next) => {
                                                     return;
                                                 }
                                                 if(result3){
-                                                    res.status(201).json({
+                                                    return res.status(201).json({
                                                         logIn: true,
                                                         message: "Class successfully created"
                                                     })
@@ -345,16 +343,6 @@ exports.createClass = (req, res, next) => {
 
     }
     
-    
-
-
-    
-
-
-    
-  
-    
-  
   
 };
 
@@ -366,9 +354,8 @@ exports.addClass = (req, res, next) => {
     if(token){
         jwt.verify(token, 'fitness secret', (err, decodedToken) => {
             if(err){
-                res.status(401).json({
-                    user: [],
-                    logIn: false,
+                return res.status(401).json({
+                    user: [],                    
                     message: "Please log in to your account"
                 });
             }else{
@@ -402,7 +389,7 @@ exports.addClass = (req, res, next) => {
                                     return;
                                 }
                                 if(result2){
-                                    res.status(201).json({
+                                    return res.status(201).json({
                                         logIn: true,
                                         message: "New class successfully added"
                                     })
@@ -439,9 +426,8 @@ exports.trainerClasses = (req, res, next) => {
     if(token){
         jwt.verify(token, 'fitness secret', (err, decodedToken) => {
             if(err){
-                res.status(401).json({
-                    user: [],
-                    logIn: false,
+                return res.status(401).json({
+                    user: [],                    
                     message: "Please log in to your account"
                 });
             }else{
@@ -464,9 +450,8 @@ exports.trainerClasses = (req, res, next) => {
         });
     }
     else{
-        res.status(401).json({
-            user: [],
-            logIn: false,
+        return res.status(401).json({
+            user: [],            
             message: "Please log in to your account"
         });
    }
@@ -484,9 +469,8 @@ exports.clientClasses = (req, res, next) => {
     if(token){
         jwt.verify(token, 'fitness secret', (err, decodedToken) => {
             if(err){
-                res.status(401).json({
-                    user: [],
-                    logIn: false,
+                return res.status(401).json({
+                    user: [],                    
                     message: "Please log in to your account"
                 });
             }else{
@@ -513,9 +497,8 @@ exports.clientClasses = (req, res, next) => {
         })
     }
     else{
-        res.status(401).json({
-            user: [],
-            logIn: false,
+        return res.status(401).json({
+            user: [],            
             message: "Please log in to your account"
         });
    }
@@ -534,9 +517,8 @@ exports.dashboard = (req, res, next) => {
         jwt.verify(token, 'fitness secret', (err, decodedToken) => {
 
             if(err){
-                res.status(401).json({
+                return res.status(401).json({
                     user: [],
-                    logIn: false,
                     message: "Please log in to your account"
                 });
             }
@@ -567,7 +549,6 @@ exports.dashboard = (req, res, next) => {
     else{
         res.status(401).json({
             user: [],
-            logIn: false,
             message: "Please log in to your account"
         });
    }
@@ -631,20 +612,20 @@ exports.getTrainerProfile = (req, res, next) => {
                                             return;
                                         }
                                         if(result3){
-                                            res.status(200).json({
+                                            return res.status(200).json({
                                                 profile: {...result3[0], numOfEntities: numOfRoles},
                                                 logIn: true
                                             });
                                         }
-                                        next();
+                                        
                                     })
                                 }
                                 else{
-                                    res.status(200).json({
+                                    return res.status(200).json({
                                         profile: result2[0],
                                         logIn: true
                                     });
-                                    next();
+                                    
                                 }
                             })
     
@@ -656,12 +637,11 @@ exports.getTrainerProfile = (req, res, next) => {
             })
         }
         else{
-            res.status(401).json({
-                user: [],
-                logIn: false,
+            return res.status(401).json({
+                user: [],                
                 message: "Please log in to your account"
             });
-            next();
+            
        }
         
     } catch (error) {
@@ -688,9 +668,8 @@ exports.getClientProfile = (req, res, next) => {
         if(token){
             jwt.verify(token, 'fitness secret', (err, decodedToken) => {
                 if(err){
-                    res.status(401).json({
-                        user: [],
-                        logIn: false,
+                    return res.status(401).json({
+                        user: [],                        
                         message: "Please log in to your account"
                     });
                 }else{
@@ -737,21 +716,20 @@ exports.getClientProfile = (req, res, next) => {
                                         }
                                         if(result3){
     
-                                            res.status(200).json({
+                                            return res.status(200).json({
                                                 profile: {...result3[0], classes: [], numberOfClasses: numOfClasses, numberOfEntities: numOfTrainers, rating: rating},                                    
                                                 logIn: true
                                             });
 
-                                            next();
                                         }
                                     })
                                 }
                                 else{
-                                    res.status(200).json({
+                                    return res.status(200).json({
                                         profile: result2[0],
                                         logIn: true
                                     });
-                                    next();
+                                    
                                 }
                             })
     
@@ -763,12 +741,12 @@ exports.getClientProfile = (req, res, next) => {
             })
         }
         else{
-            res.status(401).json({
+            return res.status(401).json({
                 user: [],
                 logIn: false,
                 message: "Please log in to your account"
             });
-            next();
+            
        }
 
         
@@ -797,9 +775,8 @@ exports.getClient = (req, res, next) => {
         if(token){
             jwt.verify(token, 'fitness secret', (err, decodedToken) => {
                 if(err){
-                    res.status(401).json({
+                    return res.status(401).json({
                         user: [],
-                        logIn: false,
                         message: "Please log in to your account"
                     });
                 }else{
@@ -832,19 +809,18 @@ exports.getClient = (req, res, next) => {
                                 }
                                 if(result2.length === 0){
 
-                                    res.status(200).json({
+                                    return res.status(200).json({
                                         clients: [],
                                         logIn: true
                                     });
-
-                                    next();
+                                    
                                 }
                                 else{
-                                    res.status(200).json({
+                                    return res.status(200).json({
                                         clients: result2,
                                         logIn: true
                                     });
-                                    next();
+                                    
                                 }
                             })
 
@@ -856,13 +832,11 @@ exports.getClient = (req, res, next) => {
             })
         }
         else{
-            res.status(401).json({
+            return res.status(401).json({
                 user: [],
-                logIn: false,
                 message: "Please log in to your account"
             });
-
-            next();
+            
         }
         
     } catch (error) {
@@ -886,9 +860,8 @@ exports.getTrainer = (req, res, next) => {
         if(token){
             jwt.verify(token, 'fitness secret', (err, decodedToken) => {
                 if(err){
-                    res.status(401).json({
-                        user: [],
-                        logIn: false,
+                    return res.status(401).json({
+                        user: [],                        
                         message: "Please log in to your account"
                     });
                 }else{
@@ -902,11 +875,11 @@ exports.getTrainer = (req, res, next) => {
                             return;
                         }
                         if(result){
-                            res.status(200).json({
+                            return res.status(200).json({
                                 trainers: result,
                                 logIn: true
                             });
-                            next();
+                            
                         }
     
                     
@@ -917,13 +890,11 @@ exports.getTrainer = (req, res, next) => {
             })
         }
         else{
-            res.status(401).json({
-                user: [],
-                logIn: false,
+            return res.status(401).json({
+                user: [],                
                 message: "Please log in to your account"
             });
     
-            next();
        }
         
     } catch (error) {
@@ -948,9 +919,8 @@ exports.getAllClasses = (req, res, next) => {
         if(token){
             jwt.verify(token, 'fitness secret', (err, decodedToken) => {
                 if(err){
-                    res.status(401).json({
-                        user: [],
-                        logIn: false,
+                    return res.status(401).json({
+                        user: [],                        
                         message: "Please log in to your account"
                     });
                 }else{
@@ -966,11 +936,11 @@ exports.getAllClasses = (req, res, next) => {
                         }
                         if(result){
     
-                            res.status(200).json({
+                            return res.status(200).json({
                                 classes: result,
                                 logIn: true
                             });
-                            next();
+                            
                         }
     
                     
@@ -981,13 +951,11 @@ exports.getAllClasses = (req, res, next) => {
             })
         }
         else{
-            res.status(401).json({
-                user: [],
-                logIn: false,
+            return res.status(401).json({
+                user: [],                
                 message: "Please log in to your account"
             });
-    
-            next();
+
        }
         
     } catch (error) {
@@ -1013,9 +981,8 @@ exports.getOneClass = (req, res, next) => {
         if(token){
             jwt.verify(token, 'fitness secret', (err, decodedToken) => {
                 if(err){
-                    res.status(401).json({
-                        user: [],
-                        logIn: false,
+                    return res.status(401).json({
+                        user: [],                        
                         message: "Please log in to your account"
                     });
                 }else{
@@ -1047,11 +1014,11 @@ exports.getOneClass = (req, res, next) => {
                            
                             
     
-                            res.status(200).json({
+                            return res.status(200).json({
                                 oneClass: oneClass,
                                 logIn: true
                             });
-                            next();
+                            
                         }
     
                     
@@ -1062,13 +1029,11 @@ exports.getOneClass = (req, res, next) => {
             })
         }
         else{
-            res.status(401).json({
-                user: [],
-                logIn: false,
+            return res.status(401).json({
+                user: [],                
                 message: "Please log in to your account"
             });
     
-            next();
         }
 
         
@@ -1094,9 +1059,8 @@ exports.editClass = (req, res, next) => {
             jwt.verify(token, 'fitness secret', (err, decodedToken) => {
     
                 if(err){
-                    res.status(401).json({
-                        user: [],
-                        logIn: false,
+                    return res.status(401).json({
+                        user: [],                        
                         message: "Please log in to your account"
                     });
                 }else{
@@ -1193,11 +1157,11 @@ exports.editClass = (req, res, next) => {
                                                         });
                 
                                                         if(toPostEquipment.length === 0){
-                                                            res.status(201).json({
+                                                            return res.status(201).json({
                                                                 logIn: true,
                                                                 message: "Class successfully updated"
                                                             });
-                                                            next();
+                                                            
                                                         }
                                                         else{
                 
@@ -1212,11 +1176,11 @@ exports.editClass = (req, res, next) => {
                                                                 }
                     
                                                                 if(result4){
-                                                                    res.status(201).json({
+                                                                    return res.status(201).json({
                                                                         logIn: true,
                                                                         message: "Class successfully updated"
                                                                     });
-                                                                    next();
+                                                                
                     
                                                                 }
                                                             });
@@ -1240,16 +1204,9 @@ exports.editClass = (req, res, next) => {
                         
                     } catch (error) {
 
-                        next(createError("Internal server error"));
+                        next(createError("Internal server error"));                
                         
-
-                       
-                        
-                    }
-    
-    
-                   
-    
+                    }  
                     
     
     

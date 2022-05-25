@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
-const db = require('../database/dbConfig');
+const db = require('../database/database');
+const createError = require('http-errors');
+
 
 const requireAuth = (req, res, next) => {
     const token = req.cookies.jwt;
@@ -29,59 +31,66 @@ const requireAuth = (req, res, next) => {
 const checkUser = (req, res, next) => {
     const token = req.cookies.jwt;
 
-    // check jwt exists and is verified
-    if(token){
-        jwt.verify(token, 'fitness secret', (err, decodedToken) => {
-            if(err){
-                res.status(401).json({
-                    user: [],
-                    logIn: false,
-                    message: "Please log in to your account"
-                });
-            }else{
 
-                const userId = decodedToken.id;
+    try {
+
+        if(token){
+            jwt.verify(token, 'fitness secret', (err, decodedToken) => {
+                if(err){
+                    next(createError("Internal server error"));
+                    return;
+            
+                }else{
+    
+                    const userId = decodedToken.id;
+                    
+                    query = 'SELECT * FROM user WHERE user_id = ?';
+    
+                    db.query(query, [userId], (err, result) => {
+                        if(err){
+                            next(createError("Internal server error"));
+                            return;
                 
-                query = 'SELECT * FROM user WHERE user_id = ?';
+                        }
+                        if(result.length === 0){
 
-                db.query(query, [userId], (err, result) => {
-                    if(err){
-                        res.status(401).json({
-                            user: [],
-                            logIn: false,
-                            message: "Please log in to your account"
-                        });
-                        next();
-                    }
-                    if(result.length === 0){
-                        res.status(401).json({
-                            user: [],
-                            logIn: false,
-                            message: "There is no account in our database that matches these credentials"
-                        });
-                        next();
-                    }
-                    else{
-                        res.status(200).json({
-                            user: result,
-                            logIn: true
-                        });
-                        next();
-                    }
-                })
+                            return res.status(200).json({
+                                user: [],
+                                logIn: false,
+                            });
+                            
+                        }
+                        if(result.length > 0){
+                            return res.status(200).json({
+                                user: result,
+                                logIn: true
+                                
+                            });
+                            
+                        }
+                    })
+    
+                }
+            })
+        }
+        else{
 
-            }
-        })
+            next(createError(401, "Please log in to your account"));
+            return;
+            // return res.status(401).json({
+            //     user: [],
+            //     message: "Please log in to your account"
+            // });
+       }
+        
+    } catch (error) {
+        next(createError("Internal server error"));
+        return;
+        
     }
-    else{
-        res.status(401).json({
-            user: [],
-            logIn: false,
-            message: "Please log in to your account"
-        });
 
-        next();
-   }
+    // check jwt exists and is verified
+   
 };
 
 

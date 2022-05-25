@@ -1,4 +1,5 @@
-const db = require('../../database/dbConfig');
+const db = require('../../database/database');
+const createError = require('http-errors');
 const { splitClass } = require('./splitClass');
 
 
@@ -36,11 +37,7 @@ exports.getClientClass = (userId, res, next) => {
                        
                     }
                     if(result2.length === 0){
-                        res.status(401).json({
-                            classes: [],
-                            logIn: true,
-                            message: "No class to display at this time"
-                        });
+                        return res.status(204);
                     }
                     else{
 
@@ -48,12 +45,14 @@ exports.getClientClass = (userId, res, next) => {
                         const classes = splitClass(result2);
 
 
-                        res.status(200).json({
+                        return res.status(200).json({
                             classes: classes,
                             logIn: true
                         });
-                        next();
+
+
                     }
+
                 })
 
             }

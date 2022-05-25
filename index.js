@@ -28,14 +28,6 @@ app.use(authRoutes);
 
 
 
-
-
-
-
-
-
-
-
 app.use( function(req, res, next) {
 
     if (req.originalUrl && req.originalUrl.split("/").pop() === 'favicon.ico') {
@@ -51,13 +43,14 @@ app.use( function(req, res, next) {
 //404 handler and pass to error handler
 app.use((req, res, next) => {
     next(createError(404, "Not found"));
+    return;
 });
 
 
 //generic error handler
 app.use((error, req, res, next) => {
-    res.status(error.status || 500);
-    res.json({
+    return res.status(error.status || 500)
+    .json({
         error: {
             status: error.status || 500,
             message: error.message

@@ -1,4 +1,4 @@
-const db = require('../database/dbConfig');
+const db = require('../database/database');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const createError = require('http-errors');
@@ -27,7 +27,7 @@ exports.register = (req, res, next) => {
         //querying
         db.query(findUser, [email], (err, user) => {
             if(user.length > 0){
-                res.json({message: "This user already exists !!!"});
+                return res.json({message: "This user already exists !!!"});
             }
             else{
                 bcrypt.hash(password, saltRounds, (err, hash) => {
@@ -50,13 +50,13 @@ exports.register = (req, res, next) => {
                             const userId = result.insertId
                             const token = createToken(userId);
                             res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000})
-                            res.status(201).
+                            return res.status(201).
                             json({
                                 logIn: true,
                                 message: "Account successfully created !!!"
                             });
     
-                            next();
+                        
                         }
                     });
                 });
@@ -83,11 +83,13 @@ exports.login = (req, res, next) => {
         const query = "SELECT * FROM user WHERE email = ?";
 
 
-        db.query(query, [email],(err, result)=> {
+        db.query(query, [email], (err, result)=> {
             
             if(err){
                                     
-                res.json("Incorrect username or password combination !!!");
+                // res.json({ errorMessage: "Incorrect username or password combination !!!" });
+                next(createError("Incorrect email or password combination !!!"));
+                return
             }
 
             if(result.length > 0){
@@ -97,13 +99,18 @@ exports.login = (req, res, next) => {
                         const userId = result[0].user_id;
                         const token = createToken(userId);
                         res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
-                        res.status(201).json({ logIn: true, message: "Login Successful" });
+                        res.status(200).json({ logIn: true, successMessage: "Login Successful" });
+
                     }
                     
                 });
             }else{
-                res.json({ message: "User doesn't exist !!!", logIn: false});
-                next();
+                
+                // next(createError(400, "User does not exist. Please provide the correct email and password"));
+                // return;
+                return res.status(400).json({ logIn: false, errorMessage: "User does not exist. Please provide the correct email and password" });
+
+                
                 
             }
         });
@@ -116,15 +123,15 @@ exports.login = (req, res, next) => {
 
 
 
-exports.logout = async (req, res) => {
+exports.logout = async (req, res, next) => {
     try {
 
         res.cookie('jwt', '', { maxAge: 1 });
-        res.json({
+        return res.json({
             logIn: false,
             user: []
         });
-        next();
+        
         
     } catch (error) {
         next(createError("Internal server error"));
