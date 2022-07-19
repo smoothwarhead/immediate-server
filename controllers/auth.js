@@ -27,7 +27,7 @@ exports.register = (req, res, next) => {
         //querying
         db.query(findUser, [email], (err, user) => {
             if(user.length > 0){
-                return res.json({message: "This user already exists !!!"});
+                return res.status(400).json({message: "This user already exists !!!"});
             }
             else{
                 bcrypt.hash(password, saltRounds, (err, hash) => {
@@ -79,7 +79,7 @@ exports.login = (req, res, next) => {
 
         
         const { email, password } = req.body;
-
+      
         const query = "SELECT * FROM user WHERE email = ?";
 
 
@@ -94,23 +94,24 @@ exports.login = (req, res, next) => {
 
             if(result.length > 0){
                 bcrypt.compare(password, result[0].password, (error, response) => {
+
+                    if(error){
+                        next(createError("Incorrect email or password combination !!!"));
+                        return
+                    }
                     if(response){
                         
                         const userId = result[0].user_id;
                         const token = createToken(userId);
                         res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
-                        res.status(200).json({ logIn: true, successMessage: "Login Successful" });
+                        return res.status(200).json({ logIn: true, message: "Login Successful" });
 
                     }
                     
                 });
             }else{
                 
-                // next(createError(400, "User does not exist. Please provide the correct email and password"));
-                // return;
-                return res.status(400).json({ logIn: false, errorMessage: "User does not exist. Please provide the correct email and password" });
-
-                
+                return res.status(400).json({ logIn: false, message: "User does not exist. Please provide the correct email and password" });
                 
             }
         });
@@ -127,7 +128,7 @@ exports.logout = async (req, res, next) => {
     try {
 
         res.cookie('jwt', '', { maxAge: 1 });
-        return res.json({
+        return res.status(200).json({
             logIn: false,
             user: []
         });

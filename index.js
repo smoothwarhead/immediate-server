@@ -10,15 +10,26 @@ let PORT = process.env.PORT || 5000;
 
 const allRoutes = require('./routes/allRoutes');
 const authRoutes = require('./routes/authRoutes');
+const allowedOrigins = require("./config/allowedOrigins");
+// const credentials = require("./middleware/credentials");
+// const corsOptionsDelegate = require("./config/corsOptions");
 
 app.use(logger('dev'));
+app.use(cors({
+  origin: allowedOrigins,
+  methods: ["GET", "POST", "DELETE", "PUT"],
+  credentials: true
+}));
 
-app.use(cors());
+
 app.use(express.json());
+
+
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(fileUpload());
+// app.options('*', cors()) // include before other routes
 
 
 app.use(allRoutes);

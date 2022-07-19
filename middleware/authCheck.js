@@ -44,7 +44,7 @@ const checkUser = (req, res, next) => {
     
                     const userId = decodedToken.id;
                     
-                    query = 'SELECT * FROM user WHERE user_id = ?';
+                    query = 'SELECT user_id AS userId, firstName, lastName, role FROM user WHERE user_id = ?';
     
                     db.query(query, [userId], (err, result) => {
                         if(err){
@@ -61,8 +61,26 @@ const checkUser = (req, res, next) => {
                             
                         }
                         if(result.length > 0){
+
+                            const getCode = () => {
+
+                                
+                                if(result[0].role === 'Trainer'){
+                                    return 3030;
+                                }
+
+                                if(result[0].role === 'Client'){                                    
+                                    return 3050;
+                                }
+
+                            }
+
+                            let user = {...result[0], allowedRole: getCode() };
+                            // console.log(user);
+
+                            
                             return res.status(200).json({
-                                user: result,
+                                user: [user],
                                 logIn: true
                                 
                             });
