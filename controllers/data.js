@@ -1,4 +1,5 @@
 const db = require('../database/database');
+const createError = require('http-errors');
 const fileUpload = require('express-fileupload');
 const jwt = require('jsonwebtoken');
 const { getClientClass } = require('./files/getClientClass');
@@ -209,7 +210,7 @@ exports.createClientProfile = (req, res, next) => {
 
                                     return res.status(201).json({
                                         logIn: true,
-                                        successMessage: "Profile successfully created"
+                                        message: "Profile successfully created"
                                     })
                                 }); 
                                 
@@ -219,7 +220,7 @@ exports.createClientProfile = (req, res, next) => {
                                 
                             }
                             else{
-                                return res.status(404).json({errorMessage: "No profile was created"})
+                                return res.status(404).json({message: "No profile was created"})
                             }
                     
                         

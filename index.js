@@ -11,8 +11,7 @@ let PORT = process.env.PORT || 5000;
 const allRoutes = require('./routes/allRoutes');
 const authRoutes = require('./routes/authRoutes');
 const allowedOrigins = require("./config/allowedOrigins");
-// const credentials = require("./middleware/credentials");
-// const corsOptionsDelegate = require("./config/corsOptions");
+
 
 app.use(logger('dev'));
 app.use(cors({

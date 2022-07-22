@@ -1,6 +1,8 @@
 const allowedOrigins = [
     "https://immediate-fitness.com",
-    "http://localhost:3000"
+    "https://immediate.netlify.app",
+    "http://localhost:3000",
+    "http://localhost:3001",
 ]
 
 module.exports = allowedOrigins;
