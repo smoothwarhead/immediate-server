@@ -10,12 +10,12 @@ let PORT = process.env.PORT || 5000;
 
 const allRoutes = require('./routes/allRoutes');
 const authRoutes = require('./routes/authRoutes');
-const allowedOrigins = require("./config/allowedOrigins");
+// const allowedOrigins = require("./config/allowedOrigins");
 
 
 app.use(logger('dev'));
 app.use(cors({
-  origin: allowedOrigins,
+  origin: "https://immediate.netlify.app",
   methods: ["GET", "POST", "DELETE", "PUT"],
   credentials: true
 }));
