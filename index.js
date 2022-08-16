@@ -15,7 +15,7 @@ const authRoutes = require('./routes/authRoutes');
 
 app.use(logger('dev'));
 app.use(cors({
-  origin: "https://immediate.netlify.app",
+  origin: "https://immediate.netlify.app/*",
   methods: ["GET", "POST", "DELETE", "PUT"],
   credentials: true
 }));
