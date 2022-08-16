@@ -12,14 +12,14 @@ const allRoutes = require('./routes/allRoutes');
 const authRoutes = require('./routes/authRoutes');
 // const allowedOrigins = require("./config/allowedOrigins");
 
-app.use(cors());
+app.use(cors({
+    origin: "https://immediate.netlify.app/",
+    methods: ["GET", "POST", "DELETE", "PUT"],
+    credentials: true
+}));
 
 app.use(logger('dev'));
-// app.use(cors({
-//   origin: "https://immediate.netlify.app/",
-//   methods: ["GET", "POST", "DELETE", "PUT"],
-//   credentials: true
-// }));
+
 
 
 app.use(express.json());
