@@ -12,11 +12,20 @@ const allRoutes = require('./routes/allRoutes');
 const authRoutes = require('./routes/authRoutes');
 // const allowedOrigins = require("./config/allowedOrigins");
 
-app.use(cors({
-    origin: "https://immediate.netlify.app/",
-    methods: ["GET", "POST", "DELETE", "PUT"],
-    credentials: true
-}));
+// app.use(cors({
+//     origin: "https://immediate.netlify.app/",
+//     methods: ["GET", "POST", "DELETE", "PUT"],
+//     credentials: true
+// }));
+
+app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "https://immediate.netlify.app");
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Accept"
+    );
+    next();
+  });
 
 app.use(logger('dev'));
 
