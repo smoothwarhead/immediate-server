@@ -4,22 +4,33 @@ const createError = require("http-errors");
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-const cors = require('cors');
+// const cors = require('cors');
 const fileUpload = require('express-fileupload');
 let PORT = process.env.PORT || 5000;
 
 const allRoutes = require('./routes/allRoutes');
 const authRoutes = require('./routes/authRoutes');
-const corsMiddleware = require('./config/corsMiddleware')
+// const corsMiddleware = require('./config/corsMiddleware');
 // const allowedOrigins = require("./config/allowedOrigins");
 
-// app.use(cors({
-//     origin: "https://immediate.netlify.app/",
-//     methods: ["GET", "POST", "DELETE", "PUT"],
-//     credentials: true
-// }));
 
-app.use(corsMiddleware);
+// app.use(corsMiddleware);
+
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "https://immediate.netlify.app")
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested, Content-Type, Accept Authorization"
+    )
+    if (req.method === "OPTIONS") {
+      res.header(
+        "Access-Control-Allow-Methods",
+        "POST, PUT, PATCH, GET, DELETE"
+      )
+      return res.status(200).json({})
+    }
+    next()
+  })
 
 app.use(logger('dev'));
 
