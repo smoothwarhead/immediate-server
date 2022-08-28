@@ -10,26 +10,26 @@ let PORT = process.env.PORT || 5000;
 
 const allRoutes = require('./routes/allRoutes');
 const authRoutes = require('./routes/authRoutes');
-// const corsMiddleware = require('./config/corsMiddleware');
+const corsMiddleware = require('./config/corsMiddleware');
 // const allowedOrigins = require("./config/allowedOrigins");
 
 
-// app.use(corsMiddleware);
+app.use(corsMiddleware);
 
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "https://immediate.netlify.app")
-    res.header("Access-Control-Allow-Credentials", true)
-    res.header(
-      "Access-Control-Allow-Headers",
-      "Origin, X-Requested, Content-Type, Accept Authorization"
-    )
-    res.header(
-        "Access-Control-Allow-Methods",
-        "POST, PUT, PATCH, GET, DELETE"
-      )
+// app.use((req, res, next) => {
+//     res.header("Access-Control-Allow-Origin", "https://immediate.netlify.app")
+//     res.header("Access-Control-Allow-Credentials", true)
+//     res.header(
+//       "Access-Control-Allow-Headers",
+//       "Origin, X-Requested, Content-Type, Accept Authorization"
+//     )
+//     res.header(
+//         "Access-Control-Allow-Methods",
+//         "POST, PUT, PATCH, GET, DELETE"
+//       )
     
-    next()
-});
+//     next()
+// });
 
 
 // app.use((req, res, next) => {
