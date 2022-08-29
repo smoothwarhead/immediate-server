@@ -1,3 +1,4 @@
+const createError = require('http-errors');
 const mysql = require('mysql');
 require('dotenv').config();
 
@@ -28,6 +29,7 @@ db.getConnection((err, connection) => {
         }
     }
     if (connection){
+        console.log("Database connected successfully");
         connection.release();
     }
 
