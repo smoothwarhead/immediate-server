@@ -19,7 +19,6 @@ exports.register = (req, res, next) => {
 
     try {
 
-        console.log(req)
 
         const {firstName, lastName, email, password, city, state, role} = req.body;
 
