@@ -99,7 +99,6 @@ exports.login = (req, res, next) => {
             }
 
             if(result.length > 0){
-                console.log(result);
                 bcrypt.compare(password, result[0].password, (error, response) => {
 
                     if(error){
@@ -110,6 +109,8 @@ exports.login = (req, res, next) => {
                         
                         const userId = result[0].user_id;
                         const token = createToken(userId);
+                        console.log(token);
+
                         res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
                         return res.status(200).json({ logIn: true, message: "Login Successful" });
 
