@@ -51,6 +51,7 @@ exports.register = (req, res, next) => {
                         if(result){
                             const userId = result.insertId
                             const token = createToken(userId);
+                            console.log(token);
                             res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000})
                             return res.status(201).
                             json({
