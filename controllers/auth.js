@@ -28,6 +28,10 @@ exports.register = (req, res, next) => {
     
         //querying
         db.query(findUser, [email], (err, user) => {
+            if(err){
+                next(createError("Internal server error"));
+                return;
+            }
             if(user.length > 0){
                 return res.status(400).json({message: "This user already exists !!!"});
             }
@@ -52,8 +56,7 @@ exports.register = (req, res, next) => {
                             const userId = result.insertId
                             const token = createToken(userId);
                             console.log(token);
-                            res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000})
-                            return res.status(201).
+                            return res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000}).status(201).
                             json({
                                 logIn: true,
                                 message: "Account successfully created !!!"
