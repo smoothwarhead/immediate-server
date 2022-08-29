@@ -19,6 +19,7 @@ exports.register = (req, res, next) => {
 
     try {
 
+        console.log(req)
 
         const {firstName, lastName, email, password, city, state, role} = req.body;
 
@@ -54,9 +55,9 @@ exports.register = (req, res, next) => {
                         if(result){
                             const userId = result.insertId
                             const token = createToken(userId);
-                            console.log(token);
-                            return res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000}).status(201).
-                            json({
+                            
+                            res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000})
+                            return res.status(201).json({
                                 logIn: true,
                                 message: "Account successfully created !!!"
                             });
@@ -98,6 +99,7 @@ exports.login = (req, res, next) => {
             }
 
             if(result.length > 0){
+                console.log(result);
                 bcrypt.compare(password, result[0].password, (error, response) => {
 
                     if(error){

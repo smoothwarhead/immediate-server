@@ -31,6 +31,8 @@ const requireAuth = (req, res, next) => {
 const checkUser = (req, res, next) => {
     const token = req.cookies.jwt;
 
+    console.log(token);
+
 
     try {
 
