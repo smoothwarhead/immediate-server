@@ -56,7 +56,7 @@ exports.register = (req, res, next) => {
                             const userId = result.insertId
                             const token = createToken(userId);
                             
-                            res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000})
+                            res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000, sameSite: "none", secure: true });
                             return res.status(201).json({
                                 logIn: true,
                                 message: "Account successfully created !!!"
@@ -111,7 +111,7 @@ exports.login = (req, res, next) => {
                         const token = createToken(userId);
                         console.log(token);
 
-                        res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
+                        res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000, sameSite: "none", secure: true });
                         return res.status(200).json({ logIn: true, message: "Login Successful" });
 
                     }
