@@ -8,7 +8,6 @@ const { splitClass } = require('./files/splitClass');
 const { splitItems } = require('./files/splitItems');
 const { itemShuffle } = require('./files/itemShuffle');
 const { cloudinary } = require('../utils/cloudinary');
-const createError = require('http-errors');
 
 
 
@@ -19,7 +18,7 @@ exports.createTrainerProfile = (req, res, next) => {
         const token = req.cookies.jwt;
 
         if(token){
-            jwt.verify(token, 'fitness secret', (err, decodedToken) => {
+            jwt.verify(token, 'fitness secret', async (err, decodedToken) => {
                 if(err){
                     return res.status(401).json({
                         user: [],                    
