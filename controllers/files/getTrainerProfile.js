@@ -56,15 +56,15 @@ exports.getTrainerProfile = (req, res, next) => {
                             }
 
                            
-                            const queryProfile1 = "SELECT t.image AS profileImage, firstName, lastName, city, state, about_me, gender, COUNT(DISTINCT (cc.client_id)) AS numberOfEntities, GROUP_CONCAT(DISTINCT type) as classes, rating, number_of_rating AS ratingNum, GROUP_CONCAT(DISTINCT specialization_name) AS specializations, COUNT(DISTINCT (c.class_id)) as numberOfClasses\
+                            const queryProfile1 = "SELECT t.image_url AS profileImage, t.image_id AS publicId, firstName, lastName, city, state, about_me, gender, COUNT(DISTINCT (cc.client_id)) AS numberOfEntities, GROUP_CONCAT(DISTINCT type) as classes, rating, number_of_rating AS ratingNum, GROUP_CONCAT(DISTINCT specialization_name) AS specializations, COUNT(DISTINCT (c.class_id)) as numberOfClasses\
                                                     \FROM user u INNER JOIN trainer t ON u.user_id = t.user_id INNER JOIN specialization s ON t.trainer_id = s.trainer_id INNER JOIN class c ON s.trainer_id = c.trainer_id INNER JOIN class_client cc ON c.class_id = cc.class_id\
                                                     \WHERE t.trainer_id = ? GROUP BY firstName";
 
-                            const queryProfile2 = "SELECT t.image AS profileImage, firstName, lastName, city, state, about_me, gender, GROUP_CONCAT(DISTINCT c.type) as classes, rating, number_of_rating AS ratingNum, GROUP_CONCAT(DISTINCT specialization_name) AS specializations, COUNT(DISTINCT (c.class_id)) as numberOfClasses\
+                            const queryProfile2 = "SELECT t.image_url AS profileImage, t.image_id AS publicId, firstName, lastName, city, state, about_me, gender, GROUP_CONCAT(DISTINCT c.type) as classes, rating, number_of_rating AS ratingNum, GROUP_CONCAT(DISTINCT specialization_name) AS specializations, COUNT(DISTINCT (c.class_id)) as numberOfClasses\
                                                     \FROM user u INNER JOIN trainer t ON u.user_id = t.user_id INNER JOIN specialization s ON t.trainer_id = s.trainer_id INNER JOIN class c ON s.trainer_id = c.trainer_id WHERE t.trainer_id = ? GROUP BY firstName";
     
     
-                            const queryProfile3 = "SELECT t.image AS profileImage, firstName, lastName, city, state, about_me, gender, GROUP_CONCAT(DISTINCT specialization_name) AS specializations\
+                            const queryProfile3 = "SELECT t.image_url AS profileImage, t.image_id AS publicId, firstName, lastName, city, state, about_me, gender, GROUP_CONCAT(DISTINCT specialization_name) AS specializations\
                                                     \FROM user u INNER JOIN trainer t ON u.user_id = t.user_id INNER JOIN specialization s ON t.trainer_id = s.trainer_id\
                                                     \WHERE t.trainer_id = ? GROUP BY firstName";
     

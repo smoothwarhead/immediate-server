@@ -7,6 +7,8 @@ const { getTrainerClass } = require('./files/getTrainerClass');
 const { splitClass } = require('./files/splitClass');
 const { splitItems } = require('./files/splitItems');
 const { itemShuffle } = require('./files/itemShuffle');
+const { cloudinary } = require('../utils/cloudinary');
+const createError = require('http-errors');
 
 
 
@@ -27,15 +29,9 @@ exports.createTrainerProfile = (req, res, next) => {
     
                     const userId = decodedToken.id;
                     
-                    const uploadFolder = `C:\\Users\\simeo\\OneDrive\\Desktop\\Deploy\\client\\public\\uploads`;
-                    const file = req.files.file;
-                    const fileName = file.name;
+
     
-                
-                    
-    
-    
-                    const { aboutMe, gender, yearOfExp, areaOfSpec } = req.body;
+                    const {file, aboutMe, gender, yearOfExp, areaOfSpec } = req.body;
     
                     const items = JSON.parse(areaOfSpec);
     
@@ -43,71 +39,76 @@ exports.createTrainerProfile = (req, res, next) => {
                     try {
     
     
-                        if(req.files === null){
+                        if(file === null){
                             return res.status(400).json({message: "No file uploaded"});
                         }
                         else{            
                 
+                            const uploadedResponse =  await cloudinary.uploader.upload(file, {
+                                upload_preset: 'immediate',
+                            });
                             
-                            const query = 'INSERT INTO trainer (image, gender, years_of_exp, about_me, user_id) VALUES(?)';
+                            if(!uploadedResponse){
+                                return res.status(400).json({message: "No file uploaded"});
+                            }
+                            
+                            if(uploadedResponse){
+
+                                const fileName = uploadedResponse.url;
+                                const fileId = uploadedResponse.public_id;
+
+                                const query = 'INSERT INTO trainer (image_url, image_id, gender, years_of_exp, about_me, user_id) VALUES(?)';
                     
                                     
-                            let values = [fileName, gender, yearOfExp, aboutMe, userId];
-        
-                            
-                            db.query(query,[values], (err, result) => {
-                            
-                                if(err){
-                                    next(createError("Internal server error"));
-                                    return;
-                                    
-                                }
-                        
-                                if(result){
-                                
-                                    trainerId = result.insertId
-    
-                                    //handle file upload
-                                    file.mv(`${uploadFolder}/${fileName}`, err => {
-                                        if(err){
-                                            next(createError("The file could not be uploaded. Please make sure the file format is correct"));                                            
-                                            return;
+                                let values = [fileName, fileId, gender, yearOfExp, aboutMe, userId];
 
-                                        }
-                        
-                                    });
-    
-                                    const query2 = "INSERT INTO specialization (specialization_name, trainer_id, user_id) VALUES ?";
-    
-                                    
-                                    db.query(query2, [items.map(item => [item.item, trainerId, userId])], (err, result2) => {
-                                        if(err){
-                                            next(createError("Internal server error"));
-                                            return;
-
-                                        }
-                                                                               
-    
-                                        return res.status(201).json({
-                                            logIn: true,
-                                            message: "Profile successfully created"
-                                        });
+                                db.query(query,[values], (err, result) => {
+                            
+                                    if(err){
+                                        next(createError("Internal server error"));
+                                        return;
                                         
-                                    }); 
-                                    
-    
-    
-    
-                                    
-                                }
-                                else{
-                                    return res.status(204);
-                                    
-                                }
-                        
+                                    }
                             
+                                    if(result){
+                                    
+                                        trainerId = result.insertId
+        
+                                        const query2 = "INSERT INTO specialization (specialization_name, trainer_id, user_id) VALUES ?";
+        
+                                        
+                                        db.query(query2, [items.map(item => [item.item, trainerId, userId])], (err, result2) => {
+                                            if(err){
+                                                next(createError("Internal server error"));
+                                                return;
+    
+                                            }
+                                                                                   
+                                            if(result2){
+                                                return res.status(201).json({
+                                                    logIn: true,
+                                                    message: "Profile successfully created"
+                                                });
+                                            }
+                                            
+                                            
+                                        }); 
+                                        
+        
+        
+        
+                                        
+                                    }
+                                    else{
+                                        return res.status(204).json({message: "No profile was created"});
+                                        
+                                    }
+                            
+                                
+                            
+                                }); 
                         
-                            }); 
+                            }
                     
                         
     
@@ -138,11 +139,11 @@ exports.createTrainerProfile = (req, res, next) => {
 }
 
 
-exports.createClientProfile = (req, res, next) => {
+exports.createClientProfile =  (req, res, next) => {
     const token = req.cookies.jwt;
 
     if(token){
-        jwt.verify(token, 'fitness secret', (err, decodedToken) => {
+        jwt.verify(token, 'fitness secret', async (err, decodedToken) => {
             if(err){
                 return res.status(401).json({
                     user: [],                    
@@ -150,82 +151,89 @@ exports.createClientProfile = (req, res, next) => {
                 });
             }else{
 
-                const userId = decodedToken.id;
-                
-                const uploadFolder = `C:\\Users\\simeo\\OneDrive\\Desktop\\Deploy\\client\\public\\uploads`;
-                const file = req.files.file;
-                const fileName = file.name;
+                const userId = decodedToken.id;      
 
-                
-
-
-                const { age, gender, height, weight, fitness_goals } = req.body;
+                const { file, age, gender, height, weight, fitness_goals } = req.body;
 
                 const items = JSON.parse(fitness_goals);
+
+                
 
 
                 try {
 
 
-                    if(req.files === null){
+                    if(file === null){
                         return res.status(400).json({message: "No file uploaded"});
                     }
                     else{        
+
+                        const uploadedResponse =  await cloudinary.uploader.upload(file, {
+                            upload_preset: 'immediate',
+                        });
+
+                        if(!uploadedResponse){
+                            return res.status(400).json({message: "No file uploaded"});
+                        }
+
+                        if(uploadedResponse){
+                            const fileName = uploadedResponse.url;
+                            const fileId = uploadedResponse.public_id;
+                            const query = 'INSERT INTO client (image_url, image_id, gender, age_range, height, weight, user_id) VALUES(?)';
+
+                            let values = [fileName, fileId, gender, age, height, weight, userId];
+
+                            db.query(query,[values], (err, result) => {
+                        
+                                if(err){
+                                    next(createError("Internal server error"));
+                                    return;
+                                }
+                        
+                                if(result){
+                                
+                                    clientId = result.insertId;
+    
+                                    const query2 = "INSERT INTO fitness_goal (goal, client_id, user_id) VALUES ?";
+    
+                                    
+                                    db.query(query2, [items.map(item => [item.item, clientId, userId])], (err, result2) => {
+                                        if(err){
+                                            next(createError("Internal server error"));
+                                            return;
+                                        }
+
+                                        if(result2){
+                                            return res.status(201).json({
+                                                logIn: true,
+                                                message: "Profile successfully created"
+                                            });
+                                        }
+                                                                            
+    
+                                        
+                                    });   
+    
+    
+    
+                                    
+                                }
+                                else{
+                                    return res.status(204).json({message: "No profile was created"})
+                                }
+                        
+                            
+                        
+                            }); 
+
+
+                        }
             
                         
-                        const query = 'INSERT INTO client (image, gender, age_range, height, weight, user_id) VALUES(?)';
                 
                                 
-                        let values = [fileName, gender, age, height, weight, userId];
     
-                        db.query(query,[values], (err, result) => {
-                        
-                            if(err){
-                                next(createError("Internal server error"));
-                                return;
-                            }
-                    
-                            if(result){
-                            
-                                clientId = result.insertId;
-
-                                //handle file upload
-                                file.mv(`${uploadFolder}/${fileName}`, err => {
-                                    if(err){
-                                        next(createError("The file could not be uploaded. Please make sure the file format is correct"));                                            
-                                        return;
-                                    }
-                    
-                                });
-
-                                const query2 = "INSERT INTO fitness_goal (goal, client_id, user_id) VALUES ?";
-
-                                
-                                db.query(query2, [items.map(item => [item.item, clientId, userId])], (err, result2) => {
-                                    if(err){
-                                        next(createError("Internal server error"));
-                                        return;
-                                    }
-                                                                        
-
-                                    return res.status(201).json({
-                                        logIn: true,
-                                        message: "Profile successfully created"
-                                    })
-                                }); 
-                                
-
-
-
-                                
-                            }
-                            else{
-                                return res.status(404).json({message: "No profile was created"})
-                            }
-                    
-                        
-                    
-                        }); 
+                       
                 
                     
 
@@ -616,7 +624,7 @@ exports.getClient = (req, res, next) => {
 
                             const trainerId = result[0].trainer_id;
 
-                            const queryClient = "SELECT firstName, lastName, cl.image AS image, city, state, group_concat(DISTINCT goal) as goals, c.format FROM user u\
+                            const queryClient = "SELECT firstName, lastName, cl.image_url AS profileImage, cl.image_id AS publicId, city, state, group_concat(DISTINCT goal) as goals, c.format FROM user u\
                                                 \INNER JOIN client cl ON u.user_id = cl.user_id INNER JOIN fitness_goal f ON cl.client_id = f.client_id INNER JOIN class_client s\
                                                 \ON f.client_id = s.client_id INNER JOIN class c ON s.class_id = c.class_id INNER JOIN trainer t ON c.trainer_id = t.trainer_id\
                                                 \WHERE t.trainer_id = ? GROUP BY firstName";
@@ -740,7 +748,7 @@ exports.getTrainer = (req, res, next) => {
                                 }
                             }
 
-                            const queryTrainers = "SELECT t.trainer_id AS trainerId, t.image AS profileImage, firstName, lastName, city, state, rating, number_of_rating AS ratingNum, GROUP_CONCAT(DISTINCT specialization_name) AS specializations\
+                            const queryTrainers = "SELECT t.trainer_id AS trainerId, t.image_url AS profileImage, t.image_id AS publicId, firstName, lastName, city, state, rating, number_of_rating AS ratingNum, GROUP_CONCAT(DISTINCT specialization_name) AS specializations\
                                                     \FROM user u INNER JOIN trainer t ON u.user_id = t.user_id INNER JOIN specialization s ON t.trainer_id = s.trainer_id INNER JOIN class c\
                                                     \ON s.trainer_id = c.trainer_id INNER JOIN class_client cc ON c.class_id = cc.class_id WHERE cc.client_id = ? GROUP BY firstName";
                                     

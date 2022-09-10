@@ -41,12 +41,12 @@ exports.getClientProfile = (req, res, next) => {
     
                             clientId = result[0].client_id;
     
-                            const queryProfile = "SELECT u.firstName AS firstName, u.lastName AS lastName, c.image AS profileImage, u.city AS city, u.state AS state, COUNT(DISTINCT (t.trainer_id)) AS numberOfEntities, GROUP_CONCAT(DISTINCT type) as classes, height, weight, GROUP_CONCAT(DISTINCT goal) AS goals, COUNT(DISTINCT (cs.class_id)) AS numberOfClasses\
+                            const queryProfile = "SELECT u.firstName AS firstName, u.lastName AS lastName, c.image_url AS profileImage, c.image_id AS publicId, u.city AS city, u.state AS state, COUNT(DISTINCT (t.trainer_id)) AS numberOfEntities, GROUP_CONCAT(DISTINCT type) as classes, height, weight, GROUP_CONCAT(DISTINCT goal) AS goals, COUNT(DISTINCT (cs.class_id)) AS numberOfClasses\
                                                     \FROM user u INNER JOIN client c ON u.user_id = c.user_id INNER JOIN fitness_goal f ON c.client_id = f.client_id INNER JOIN class_client cl ON f.client_id = cl.client_id\
                                                     \INNER JOIN class cs ON cl.class_id = cs.class_id INNER JOIN trainer t ON cs.trainer_id = t.trainer_id WHERE c.client_id = ? GROUP BY firstName";
     
     
-                            const clientProfile = "SELECT u.firstName AS firstName, u.lastName AS lastName, c.image AS profileImage, u.city AS city, u.state AS state, height, weight, GROUP_CONCAT(DISTINCT goal) AS goals\
+                            const clientProfile = "SELECT u.firstName AS firstName, u.lastName AS lastName, c.image_url AS profileImage, c.image_id AS publicId, u.city AS city, u.state AS state, height, weight, GROUP_CONCAT(DISTINCT goal) AS goals\
                                                     \FROM user u INNER JOIN client c ON u.user_id = c.user_id INNER JOIN fitness_goal f ON c.client_id = f.client_id\
                                                     \WHERE c.client_id = ? GROUP BY firstName";
     
