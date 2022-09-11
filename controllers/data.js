@@ -7,7 +7,6 @@ const { getTrainerClass } = require('./files/getTrainerClass');
 const { splitClass } = require('./files/splitClass');
 const { splitItems } = require('./files/splitItems');
 const { itemShuffle } = require('./files/itemShuffle');
-const { cloudinary } = require('../utils/cloudinary');
 
 
 
@@ -27,10 +26,9 @@ exports.createTrainerProfile = (req, res, next) => {
                 }else{
     
                     const userId = decodedToken.id;
-                    
-
+                        
     
-                    const {file, aboutMe, gender, yearOfExp, areaOfSpec } = req.body;
+                    const {fileName, fileId, aboutMe, gender, yearOfExp, areaOfSpec } = req.body;
     
                     const items = JSON.parse(areaOfSpec);
     
@@ -38,77 +36,61 @@ exports.createTrainerProfile = (req, res, next) => {
                     try {
     
     
-                        if(file === null){
+                        if(fileName === null){
                             return res.status(400).json({message: "No file uploaded"});
                         }
-                        else{            
-                
-                            const uploadedResponse =  await cloudinary.uploader.upload(file, {
-                                upload_preset: 'immediate',
-                            });
-                            
-                            if(!uploadedResponse){
-                                return res.status(400).json({message: "No file uploaded"});
-                            }
-                            
-                            if(uploadedResponse){
-
-                                const fileName = uploadedResponse.url;
-                                const fileId = uploadedResponse.public_id;
-
-                                const query = 'INSERT INTO trainer (image_url, image_id, gender, years_of_exp, about_me, user_id) VALUES(?)';
+                        else{   
+                                     
+                            const query = 'INSERT INTO trainer (image_url, image_id, gender, years_of_exp, about_me, user_id) VALUES(?)';
                     
                                     
-                                let values = [fileName, fileId, gender, yearOfExp, aboutMe, userId];
+                            let values = [fileName, fileId, gender, yearOfExp, aboutMe, userId];
 
-                                db.query(query,[values], (err, result) => {
-                            
-                                    if(err){
-                                        next(createError("Internal server error"));
-                                        return;
-                                        
-                                    }
-                            
-                                    if(result){
-                                    
-                                        trainerId = result.insertId
-        
-                                        const query2 = "INSERT INTO specialization (specialization_name, trainer_id, user_id) VALUES ?";
-        
-                                        
-                                        db.query(query2, [items.map(item => [item.item, trainerId, userId])], (err, result2) => {
-                                            if(err){
-                                                next(createError("Internal server error"));
-                                                return;
-    
-                                            }
-                                                                                   
-                                            if(result2){
-                                                return res.status(201).json({
-                                                    logIn: true,
-                                                    message: "Profile successfully created"
-                                                });
-                                            }
-                                            
-                                            
-                                        }); 
-                                        
-        
-        
-        
-                                        
-                                    }
-                                    else{
-                                        return res.status(204).json({message: "No profile was created"});
-                                        
-                                    }
-                            
-                                
-                            
-                                }); 
+                            db.query(query,[values], (err, result) => {
                         
-                            }
-                    
+                                if(err){
+                                    next(createError("Internal server error"));
+                                    return;
+                                    
+                                }
+                        
+                                if(result){
+                                
+                                    trainerId = result.insertId
+    
+                                    const query2 = "INSERT INTO specialization (specialization_name, trainer_id, user_id) VALUES ?";
+    
+                                    
+                                    db.query(query2, [items.map(item => [item.item, trainerId, userId])], (err, result2) => {
+                                        if(err){
+                                            next(createError("Internal server error"));
+                                            return;
+
+                                        }
+                                                                               
+                                        if(result2){
+                                            return res.status(201).json({
+                                                logIn: true,
+                                                message: "Profile successfully created"
+                                            });
+                                        }
+                                        
+                                        
+                                    }); 
+                                    
+    
+    
+    
+                                    
+                                }
+                                else{
+                                    return res.status(204).json({message: "No profile was created"});
+                                    
+                                }
+                        
+                            
+                        
+                            }); 
                         
     
            
@@ -152,7 +134,7 @@ exports.createClientProfile =  (req, res, next) => {
 
                 const userId = decodedToken.id;      
 
-                const { file, age, gender, height, weight, fitness_goals } = req.body;
+                const { fileName, fileId, age, gender, height, weight, fitness_goals } = req.body;
 
                 const items = JSON.parse(fitness_goals);
 
@@ -162,22 +144,11 @@ exports.createClientProfile =  (req, res, next) => {
                 try {
 
 
-                    if(file === null){
+                    if(fileName === null){
                         return res.status(400).json({message: "No file uploaded"});
                     }
-                    else{        
+                    else{                     
 
-                        const uploadedResponse =  await cloudinary.uploader.upload(file, {
-                            upload_preset: 'immediate',
-                        });
-
-                        if(!uploadedResponse){
-                            return res.status(400).json({message: "No file uploaded"});
-                        }
-
-                        if(uploadedResponse){
-                            const fileName = uploadedResponse.url;
-                            const fileId = uploadedResponse.public_id;
                             const query = 'INSERT INTO client (image_url, image_id, gender, age_range, height, weight, user_id) VALUES(?)';
 
                             let values = [fileName, fileId, gender, age, height, weight, userId];
@@ -223,16 +194,7 @@ exports.createClientProfile =  (req, res, next) => {
                         
                             
                         
-                            }); 
-
-
-                        }
-            
-                        
-                
-                                
-    
-                       
+                            });       
                 
                     
 
