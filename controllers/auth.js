@@ -115,11 +115,16 @@ exports.login = (req, res, next) => {
                         return res.status(200).json({ logIn: true, message: "Login Successful" });
 
                     }
+
+                    if(!response){
+                        return res.status(400).json({ logIn: false, message: "Incorrect email or password combination !!!" });
+
+                    }
                     
                 });
             }else{
                 
-                return res.status(400).json({ logIn: false, message: "User does not exist. Please provide the correct email and password" });
+                return res.status(404).json({ logIn: false, message: "User does not exist. Please provide the correct email and password" });
                 
             }
         });
