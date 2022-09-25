@@ -278,19 +278,35 @@ exports.createClass = (req, res, next) => {
                                         }
                                         if(result2){
 
-                                            db.query(query3, [equipments.map(equipment => [equipment.item, classId, trainerId, userId])], (err, result3) => {
+                                            if(equipments.length === 0){
+                         
+                                                return res.status(201).json({
+                                                    logIn: true,
+                                                    message: "Class successfully created"
+                                                });
+                                            
+                                            }
 
-                                                if(err){
-                                                    next(createError("Internal server error"));
-                                                    return;
-                                                }
-                                                if(result3){
-                                                    return res.status(201).json({
-                                                        logIn: true,
-                                                        message: "Class successfully created"
-                                                    })
-                                                }
-                                            })
+                                            if(equipments.length > 0){
+
+                                                db.query(query3, [equipments.map(equipment => [equipment.item, classId, trainerId, userId])], (err, result3) => {
+
+                                                    if(err){
+                                                        next(createError("Internal server error"));
+                                                        return;
+                                                    }
+                                                    if(result3){
+                                                        return res.status(201).json({
+                                                            logIn: true,
+                                                            message: "Class successfully created"
+                                                        })
+                                                    }
+                                                })
+                                            }
+
+
+
+                                            
 
                                         }
                                     });
@@ -921,16 +937,50 @@ exports.getOneClass = (req, res, next) => {
                     });
                 }else{
     
-                    const getOneClassQuery = "SELECT c.class_id AS classId, t.trainer_id AS trainerId, firstName, lastName, type, level, format, description, start_time, end_time, start_date, frequency, GROUP_CONCAT(DISTINCT e.equipment_id) AS equipmentId, GROUP_CONCAT(e.name) AS equipmentName\
+                    const getOneClassQuery1 = "SELECT c.class_id AS classId, t.trainer_id AS trainerId, firstName, lastName, type, level, format, description, start_time, end_time, start_date, frequency, GROUP_CONCAT(DISTINCT e.equipment_id) AS equipmentId, GROUP_CONCAT(e.name) AS equipmentName\
                                         \FROM user u INNER JOIN trainer t ON u.user_id = t.user_id INNER JOIN class c ON t.trainer_id = c.trainer_id INNER JOIN schedule s ON c.class_id = s.class_id\
                                         \INNER JOIN equipment e ON s.class_id = e.class_id WHERE c.class_id = ?";
+
+
+                    const getOneClassQuery2 = "SELECT c.class_id AS classId, t.trainer_id AS trainerId, firstName, lastName, type, level, format, description, start_time, end_time, start_date, frequency\
+                                                \FROM user u INNER JOIN trainer t ON u.user_id = t.user_id INNER JOIN class c ON t.trainer_id = c.trainer_id\
+                                                \INNER JOIN schedule s ON c.class_id = s.class_id WHERE c.class_id = ?";
     
-                     db.query(getOneClassQuery,[id], (err, result) => {
+                     db.query(getOneClassQuery1,[id], (err, result) => {
                         if(err){
                             next(createError("Internal server error"));
                             return;
                         }
-                        if(result){
+
+
+                        if(result[0].classId === null || result.length === 0){
+                            db.query(getOneClassQuery2, [id], (err, result2) => {
+                                if(err){
+                                    next(createError("Internal server error"));
+                                    return;
+                                }
+
+                                if(result2.length > 0){
+                                    const equipments = [];
+                                    const oneClass = {...result2[0], equipments}
+
+                                   
+                                    return res.status(200).json({
+                                        oneClass: [oneClass],
+                                        logIn: true
+                                    });
+                                }
+                                if(result2.length === 0){
+                                    return res.status(204).json({
+                                        oneClass: [],
+                                        logIn: true
+                                    });
+                                }
+                            })
+                        }
+
+
+                        else{
     
                             const equipmentIds = result[0].equipmentId.split(",");
                             const equipmentNames = result[0].equipmentName.split(",");
@@ -944,7 +994,7 @@ exports.getOneClass = (req, res, next) => {
     
                             };
     
-                            const oneItem = {...result[0], equipments: equipments}
+                            const oneItem = {...result[0], equipments: equipments};
 
                             const oneClass = splitClass([oneItem]);
                            
@@ -955,6 +1005,8 @@ exports.getOneClass = (req, res, next) => {
                             });
                             
                         }
+
+                        
     
                     
                     })

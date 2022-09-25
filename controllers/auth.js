@@ -33,7 +33,9 @@ exports.register = (req, res, next) => {
                 return;
             }
             if(user.length > 0){
-                return res.status(400).json({message: "This user already exists !!!"});
+                // return res.status(400).json({message: "This user already exists !!!"});
+                next(createError(400, "This user already exists !!!"));
+
             }
             else{
                 bcrypt.hash(password, saltRounds, (err, hash) => {

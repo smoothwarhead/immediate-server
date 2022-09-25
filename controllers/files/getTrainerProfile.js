@@ -64,6 +64,8 @@ exports.getTrainerProfile = (req, res, next) => {
                                                     \FROM user u INNER JOIN trainer t ON u.user_id = t.user_id INNER JOIN specialization s ON t.trainer_id = s.trainer_id INNER JOIN class c ON s.trainer_id = c.trainer_id WHERE t.trainer_id = ? GROUP BY firstName";
     
     
+                                                    //
+
                             const queryProfile3 = "SELECT t.image_url AS profileImage, t.image_id AS publicId, firstName, lastName, city, state, about_me, gender, GROUP_CONCAT(DISTINCT specialization_name) AS specializations\
                                                     \FROM user u INNER JOIN trainer t ON u.user_id = t.user_id INNER JOIN specialization s ON t.trainer_id = s.trainer_id\
                                                     \WHERE t.trainer_id = ? GROUP BY firstName";
@@ -99,7 +101,8 @@ exports.getTrainerProfile = (req, res, next) => {
                                                 if(result4){
                                                     let classes = [];
 
-                                                    const trainerRating = getTrainerRating(result3[0].rating, result3[0].ratingNum);
+                                                    // const trainerRating = getTrainerRating(result3[0].rating, result3[0].ratingNum);
+                                                    const trainerRating = 0;
 
 
                                                     const specializations = splitItems(result4[0].specializations);
